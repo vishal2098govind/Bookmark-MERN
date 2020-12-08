@@ -1,0 +1,4 @@
+{
+  "mongoURI": "mongodb+srv://vishal_a_geek:vishal2098@bookmark-v1.yfi95.mongodb.net/boookmarks?retryWrites=true&w=majority",
+  "jwtSecret": "bookmarkMedia"
+}
