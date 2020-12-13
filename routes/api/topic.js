@@ -93,7 +93,7 @@ router.get('/:tpId', auth, async (req, res) => {
       select: 'subTopic bookmarks',
       populate: {
         path: 'bookmarks',
-        select: 'bookmarkUrl',
+        select: 'bookmarkUrl year',
       },
     });
     res.json(topic);
@@ -101,6 +101,33 @@ router.get('/:tpId', auth, async (req, res) => {
     console.error(error.message);
     if (error.king === 'ObjectId') {
       return res.status(404).json({ errors: [{ msg: 'Topic not found' }] });
+    }
+    res.status(500).send('Server Error');
+  }
+});
+
+// @route   GET /api/topic/sub/:subId
+// @desc    Get all topics of subject
+// @access  Private
+router.get('/sub/:subId', auth, async (req, res) => {
+  try {
+    const topics = await Topic.find({
+      subject: req.params.subId,
+      user: req.user.id,
+    }).populate({
+      path: 'subTopics',
+      select: 'subTopic bookmarks',
+      populate: {
+        path: 'bookmarks',
+        select: 'bookmarkUrl year',
+      },
+    });
+
+    res.json(topics);
+  } catch (error) {
+    console.error(error.message);
+    if (error.king === 'ObjectId') {
+      return res.status(404).json({ errors: [{ msg: 'Subject not found' }] });
     }
     res.status(500).send('Server Error');
   }

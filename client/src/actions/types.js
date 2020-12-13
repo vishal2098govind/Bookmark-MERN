@@ -1,0 +1,27 @@
+// Auth
+export const LOGIN_SUCCESS = 'LOGIN_SUCCESS';
+export const LOGIN_FAIL = 'LOGIN_FAIL';
+export const LOGOUT_USER = 'LOGOUT_USER';
+export const REGISTER_SUCCESS = 'REGISTER_SUCCESS';
+export const REGISTER_FAIL = 'REGISTER_FAIL';
+export const USER_LOADED = 'USER_LOADED';
+export const AUTH_ERROR = 'AUTH_ERROR';
+
+// Alerts
+export const SET_ALERT = 'SET_ALERT';
+export const REMOVE_ALERT = 'REMOVE_ALERT';
+
+// Subjects
+export const SUBJECTS_LOADED = 'SUBJECTS_LOADED';
+
+// Topics
+export const TOPICS_LOADED = 'TOPICS_LOADED';
+export const TOPICS_FOR_A_SUBJECT_LOADED = 'TOPICS_FOR_A_SUBJECT_LOADED';
+
+// Subtopics
+export const SUBTOPICS_FOR_A_TOPIC_LOADED = 'SUBTOPICS_FOR_A_TOPIC_LOADED';
+export const SUBTOPICS_LOADED = 'SUBTOPICS_LOADED';
+
+// Bookmarks
+export const BOOKMARKS_FOR_A_SUBTOPIC_LOADED =
+  'BOOKMARKS_FOR_A_SUBTOPIC_LOADED';

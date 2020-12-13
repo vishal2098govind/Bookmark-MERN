@@ -66,7 +66,7 @@ router.get('/', auth, async (req, res) => {
   try {
     const subTopics = await SubTopic.find({ user: req.user.id }).populate({
       path: 'bookmarks',
-      select: 'subject topic subTopic bookmarkUrl',
+      select: 'subject topic subTopic bookmarkUrl year',
     });
 
     res.json(subTopics);
@@ -86,7 +86,7 @@ router.get('/:subTpId', auth, async (req, res) => {
       user: req.user.id,
     }).populate({
       path: 'bookmarks',
-      select: 'bookmarkUrl',
+      select: 'bookmarkUrl year',
     });
 
     if (!subTopic) {
@@ -98,6 +98,30 @@ router.get('/:subTpId', auth, async (req, res) => {
     console.error(error.message);
     if (error.kind === 'ObjectId') {
       return res.status(404).json({ errors: [{ msg: 'Subtopic not found' }] });
+    }
+    res.status(500).send('Server Error');
+  }
+});
+
+// @route   GET api/subtopic/:subId/:tpId
+// @desc    Get all subtopics of a topic of a subject
+// @access  Private
+router.get('/:subId/:tpId', auth, async (req, res) => {
+  try {
+    const subTopics = await SubTopic.find({
+      subject: req.params.subId,
+      topic: req.params.tpId,
+      user: req.user.id,
+    }).populate({
+      path: 'bookmarks',
+      select: 'bookmarkUrl year',
+    });
+
+    res.json(subTopics);
+  } catch (error) {
+    console.error(error.message);
+    if (error.kind === 'ObjectId') {
+      return res.status(404).json({ errors: [{ msg: 'Resource not found' }] });
     }
     res.status(500).send('Server Error');
   }

@@ -13,7 +13,13 @@ const router = express.Router();
 // @access    Private
 router.post(
   '/:subId/:tpId/:subTpId',
-  [auth, [check('bookmarkUrl', 'Valid URL is required').isURL()]],
+  [
+    auth,
+    [
+      check('bookmarkUrl', 'Valid URL is required').isURL(),
+      check('year', 'Year is required').notEmpty(),
+    ],
+  ],
   async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -61,7 +67,7 @@ router.post(
 
 // @route     GET /api/bookmark/
 // @desc      Get all bookmarks
-// @access    Public
+// @access    Private
 router.get('/', async (req, res) => {
   try {
     const bookmarks = await Bookmark.find().populate({
@@ -77,7 +83,7 @@ router.get('/', async (req, res) => {
 
 // @route     GET /api/bookmark/:bmId
 // @desc      Get bookmark by ID
-// @access    Public
+// @access    Private
 router.get('/:bmId', async (req, res) => {
   try {
     const bookmark = await Bookmark.findById(req.params.bmId);
@@ -92,38 +98,57 @@ router.get('/:bmId', async (req, res) => {
   }
 });
 
+// @route   GET /api/bookmark/:subId/:tpId/:subTpId
+// @desc    Get all bookmarks for a subtopic of a topic of a subject
+// @access  Private
+router.get('/:subId/:tpId/:subTpId', auth, async (req, res) => {
+  try {
+    const subtopics = await Bookmark.find({
+      subject: req.params.subId,
+      topic: req.params.tpId,
+      subTopic: req.params.subTpId,
+      user: req.user.id,
+    });
+
+    res.json(subtopics);
+  } catch (error) {
+    console.error(error.message);
+    if (error.kind === 'ObjectId') {
+      return res.status(404).json({ errors: [{ msg: 'Resource not found' }] });
+    }
+    res.status(500).send('Server Error');
+  }
+});
+
 // @route     PUT /api/bookmark/:bmId
 // @desc      Update bookmark
 // @access    Private
-router.put(
-  '/:bmId',
-  [auth, [check('bookmarkUrl', 'Valid URL is required')]],
-  async (req, res) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
+router.put('/:bmId', auth, async (req, res) => {
+  try {
+    const bookmark = await Bookmark.findById(req.params.bmId);
+    if (!bookmark) {
+      return res.status(404).json({ errors: [{ msg: 'Bookmark not found' }] });
     }
-    try {
-      const bookmark = await Bookmark.findById(req.params.bmId);
-      if (!bookmark) {
-        return res
-          .status(404)
-          .json({ errors: [{ msg: 'Bookmark not found' }] });
-      }
 
-      if (bookmark.user.toString() !== req.user.id) {
-        return res.status(401).json({ errors: [{ msg: 'Unauthorized' }] });
-      }
-
-      bookmark.bookmarkUrl = req.body.bookmarkUrl;
-      await bookmark.save();
-      res.json(bookmark);
-    } catch (error) {
-      console.error(error.message);
-      res.status(500).send('Server Error');
+    if (bookmark.user.toString() !== req.user.id) {
+      return res.status(401).json({ errors: [{ msg: 'Unauthorized' }] });
     }
+
+    const { bookmarkUrl, year } = req.body;
+
+    if (bookmarkUrl) {
+      bookmark.bookmarkUrl = bookmarkUrl;
+    }
+    if (year) {
+      bookmark.year = year;
+    }
+    await bookmark.save();
+    res.json(bookmark);
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).send('Server Error');
   }
-);
+});
 
 // @route     DELETE  /api/bookmark/:bmId
 // @desc      Remove bookmark

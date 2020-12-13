@@ -19,6 +19,10 @@ const BookmarkSchema = new mongoose.Schema({
     type: mongoose.SchemaTypes.Url,
     required: true,
   },
+  year: {
+    type: Number,
+    required: true,
+  },
 });
 
 module.exports = Bookmark = mongoose.model('bookmarks', BookmarkSchema);

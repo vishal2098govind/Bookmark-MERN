@@ -53,7 +53,7 @@ router.get('/', auth, async (req, res) => {
         select: 'subTopic user bookmarks',
         populate: {
           path: 'bookmarks',
-          select: 'bookmarkUrl user',
+          select: 'bookmarkUrl year user',
         },
       },
     });
